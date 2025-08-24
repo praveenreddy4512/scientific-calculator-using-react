@@ -9,26 +9,35 @@ function App() {
     setInput((prev) => prev + value);
   };
 
-  const handleClear = () => {
-    setInput("");
-  };
+  const handleClear = () => setInput("");
+  const handleBackspace = () => setInput((prev) => prev.slice(0, -1));
 
-  const handleBackspace = () => {
-    setInput((prev) => prev.slice(0, -1));
-  };
+  const factorial = (n) => (n <= 1 ? 1 : n * factorial(n - 1));
 
   const handleCalculate = () => {
     try {
       let expression = input
+        .replace(/π/g, "Math.PI")
+        .replace(/e/g, "Math.E")
         .replace(/sin/g, "Math.sin")
         .replace(/cos/g, "Math.cos")
         .replace(/tan/g, "Math.tan")
+        .replace(/cot/g, "1/Math.tan")
+        .replace(/sinh/g, "Math.sinh")
+        .replace(/cosh/g, "Math.cosh")
+        .replace(/tanh/g, "Math.tanh")
         .replace(/log/g, "Math.log10")
         .replace(/ln/g, "Math.log")
         .replace(/√/g, "Math.sqrt")
-        .replace(/\^/g, "**");
+        .replace(/∛/g, "Math.cbrt")
+        .replace(/x²/g, "**2")
+        .replace(/x³/g, "**3")
+        .replace(/10\^/g, "10**")
+        .replace(/e\^/g, "Math.E**")
+        .replace(/\^/g, "**")
+        .replace(/(\d+)!/g, (_, n) => factorial(parseInt(n)));
 
-      // If DEG mode, convert degrees to radians
+      // Convert trig to DEG if necessary
       if (isDegree) {
         expression = expression.replace(
           /Math\.(sin|cos|tan)\(([^)]+)\)/g,
@@ -47,7 +56,10 @@ function App() {
     "4", "5", "6", "*", "cos",
     "1", "2", "3", "-", "tan",
     "0", ".", "^", "+", "log",
-    "(", ")", "√", "ln", "=",
+    "(", ")", "√", "ln", "cot",
+    "π", "e", "x²", "x³", "∛",
+    "10^", "e^", "sinh", "cosh", "tanh",
+    "!", "=", 
   ];
 
   return (
@@ -67,7 +79,9 @@ function App() {
           {buttons.map((btn, i) => (
             <button
               key={i}
-              onClick={() => (btn === "=" ? handleCalculate() : handleClick(btn))}
+              onClick={() =>
+                btn === "=" ? handleCalculate() : handleClick(btn)
+              }
             >
               {btn}
             </button>
